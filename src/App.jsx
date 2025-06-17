@@ -5,6 +5,7 @@ import PricingConfig from './components/PricingConfig'
 import Sections from './components/Sections'
 import TotalSummary from './components/TotalSummary'
 import PdfGenerator from './components/PdfGenerator'
+import PrintTemplate from './components/PrintTemplate'
 import { v4 as uuidv4 } from 'uuid'
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
     companyPhone: '+91 90300 77709',
     companyEmail: 'info@inspaceinteriors.in',
   })
+
+  const [termsType, setTermsType] = useState('');
 
   const [pricingRates, setPricingRates] = useState({
     'Panneling': 250,
@@ -58,6 +61,7 @@ function App() {
     const savedQuotation = localStorage.getItem('quotationInfo')
     const savedSections = localStorage.getItem('quotationSections')
     const savedPricingRates = localStorage.getItem('pricingRates')
+    const savedTermsType = localStorage.getItem('termsType')
 
     if (savedQuotation) {
       setQuotationInfo(JSON.parse(savedQuotation))
@@ -73,12 +77,14 @@ function App() {
     if (savedPricingRates) {
       setPricingRates(JSON.parse(savedPricingRates))
     }
+    if (savedTermsType) setTermsType(savedTermsType)
   }, [])
 
   useEffect(() => {
     localStorage.setItem('quotationInfo', JSON.stringify(quotationInfo))
     localStorage.setItem('quotationSections', JSON.stringify(sections))
     localStorage.setItem('pricingRates', JSON.stringify(pricingRates))
+    
   }, [quotationInfo, sections, pricingRates])
 
   const handleQuotationInfoChange = (e) => {
@@ -186,7 +192,24 @@ function App() {
                 quotationInfo={quotationInfo}
                 sections={sections}
                 grandTotal={calculateGrandTotal()}
+                termsType={termsType}
               />
+
+              <div className="card mt-3">
+                <label className="block text-gray-700 font-semibold mb-2">Select Terms Type</label>
+                <select
+                  value={termsType}
+                  onChange={(e) => {
+                    setTermsType(e.target.value)
+                    localStorage.setItem('termsType', e.target.value)
+                  }}
+                  className="input-field w-full"
+                >
+                  <option value="">-- Select Terms Type --</option>
+                  <option value="Gurjan Basic">Gurjan 710 Basic</option>
+                  <option value="Gurjan BWP">Gurjan 710 BWP</option>
+                </select>
+            </div>
 
               <button
                 onClick={handleClearAll}

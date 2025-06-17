@@ -1,4 +1,3 @@
-// ✅ FINAL UPDATED PrintTemplate.jsx
 import { forwardRef } from 'react'
 
 const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) => {
@@ -16,6 +15,31 @@ const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) 
 
   const calculateSectionTotal = (section) => {
     return section.items.reduce((total, item) => total + calculateItemTotal(item), 0)
+  }
+
+  // 🟨 Get selected terms type from localStorage
+  const termsType = localStorage.getItem('termsType') || ''
+
+  // ✅ Terms Generator
+  const renderTermsByType = (type) => {
+    if (type === 'Gurjan Basic') {
+      return `
+      1. This quotation applies to Gurjan 710 Basic-grade plywood.
+      2. Inner Laminate of 0.8mm thickness.
+      3. External Laminate of 1mm thickness glossy/mat.
+      4. Hardware of one year standard warranty.
+      5. Handles of basic ss model.
+      6. Wire baskets included.`
+    } else if (type === 'Gurjan BWP') {
+      return `
+      1. Playwood of BWP Gurjan 710 grade.
+      2. Innter Laminate of 0.8mm thickness + Fabric model.
+      3. External Laminate of 1mm thickness glossy/mat.
+      4. Hardware of 5 year standard warranty.
+      5. G profile handles for kitchen and midvariant for wardobes ss make
+      6. Wire basket included.`
+    }
+    return ''
   }
 
   return (
@@ -93,17 +117,16 @@ const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) 
         <p className="text-2xl font-bold text-primary-800">₹{grandTotal.toFixed(2)}</p>
       </div>
 
-      {/* Terms */}
+      {/* NOTE */}
       <div className="mt-12">
-        <h3 className="text-lg font-semibold mb-2">Terms & Conditions:</h3>
-        <ul className="text-sm text-gray-700 list-decimal pl-5">
-          <li>50% advance payment required to start the work.</li>
-          <li>Balance payment to be made before installation.</li>
-          <li>Prices are valid for 30 days from the date of quotation.</li>
-          <li>Delivery time: 4–6 weeks from the date of order confirmation.</li>
-        </ul>
-        <p className="mt-3 text-gray-700 whitespace-pre-line">
-          <b>Note: <br/> </b>{quotationInfo.additionalNote}
+        <h3 className="text-lg font-semibold mb-2">Note:</h3>
+        <p className="text-sm text-gray-700 whitespace-pre-line">
+          1. 50% advance payment required to start the work.<br />
+          2. 20% After Carcasing work.<br />
+          3. 20% After at the time of hardware.<br />
+          4. 10% Before site handover.<br />
+          5. Prices are valid for 30 days from the date of quotation.<br />
+          {quotationInfo.additionalNote && `\n${quotationInfo.additionalNote}`}
         </p>
       </div>
 
@@ -119,10 +142,34 @@ const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) 
           <p className="text-sm text-gray-600 mt-1">Authorized Signatory</p>
         </div>
       </div>
+
+      {/* Terms & Conditions Page */}
+      {termsType && (
+        <>
+          <div className="break-before-page pt-12 px-8">
+            <h2 className="text-xl font-bold mb-4">Terms & Conditions</h2>
+            <pre className="whitespace-pre-wrap text-sm text-gray-700">
+              {renderTermsByType(termsType)}
+            </pre>
+
+            {/* Signature Block 2 */}
+            <div className="mt-12 pt-8 border-t border-gray-300 grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-10">Customer Signature</p>
+                <div className="border-t border-gray-400 w-40"></div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600 mb-10">For {quotationInfo.companyName}</p>
+                <div className="border-t border-gray-400 w-40 ml-auto"></div>
+                <p className="text-sm text-gray-600 mt-1">Authorized Signatory</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 })
 
 PrintTemplate.displayName = 'PrintTemplate'
-
 export default PrintTemplate
