@@ -208,6 +208,7 @@ function App() {
                   <option value="">-- Select Terms Type --</option>
                   <option value="Gurjan Basic">Gurjan 710 Basic</option>
                   <option value="Gurjan BWP">Gurjan 710 BWP</option>
+                  <option value="HDHMR">HDHMR Material</option>
                 </select>
             </div>
 

@@ -38,6 +38,15 @@ const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) 
       4. Hardware of 5 year standard warranty.
       5. G profile handles for kitchen and midvariant for wardobes ss make
       6. Wire basket included.`
+    } else if (type === 'HDHMR') {
+      return `
+      1. HDHMR Sheets will be used.
+      2. Innter Laminate of 0.8mm thickness + Fabric model.
+      3. External Laminate of 1mm thickness glossy/mat.
+      4. Hardware equivalent to Ebco/Hittich/Godrage/Nimmi.
+      5. G profile handles for kitchen and highend model handles for all.
+      6. Tandom Baskets. 
+      `
     }
     return ''
   }
