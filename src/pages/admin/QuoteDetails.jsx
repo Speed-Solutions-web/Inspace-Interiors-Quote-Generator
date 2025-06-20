@@ -13,7 +13,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ClipLoader } from 'react-spinners'
 
-const baseUrl = 'http://localhost:5000/api'
+const baseUrl = 'https://inspace-quote-backend.onrender.com/api'
 
 function QuoteDetails() {
   const { id: clientId } = useParams()
