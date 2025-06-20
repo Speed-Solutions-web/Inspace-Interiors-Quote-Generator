@@ -21,13 +21,13 @@ ChartJS.register(
   Legend
 );
 
-const QuotesChart = () => {
-  const data = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+const QuotesChart = ({ data }) => {
+  const chartData = {
+    labels: data?.labels || [],
     datasets: [
       {
         label: 'Quotes Created',
-        data: [2, 4, 3, 6, 5, 1, 7], // 👈 Replace with dynamic data later
+        data: data?.datasets?.[0]?.data || [],
         borderColor: '#723030',
         backgroundColor: 'rgba(114, 48, 48, 0.2)',
         fill: true,
@@ -77,7 +77,7 @@ const QuotesChart = () => {
 
   return (
     <div className="bg-white p-3">
-      <Line data={data} options={options} />
+      <Line data={chartData} options={options} />
     </div>
   );
 };

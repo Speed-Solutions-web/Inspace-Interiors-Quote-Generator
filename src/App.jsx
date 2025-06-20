@@ -11,6 +11,7 @@ import QuoteForm from './pages/admin/QuoteForm'
 import ProtectedRoute from './components/ProtectedRoute' // ✅ import it
 
 export default class App extends Component {
+  
   render() {
     return (
       <Router>
