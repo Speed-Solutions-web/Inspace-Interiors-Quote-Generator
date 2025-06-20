@@ -1,2 +1,2 @@
-const baseUrl = 'http://localhost:5000/api'; // change if deployed
+const baseUrl = 'https://inspace-quote-backend.onrender.com/api'; // change if deployed
 export default baseUrl;
