@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import withNavigation from '../../utils/withNavigation';
 
-const baseUrl = 'http://localhost:5000';
+const baseUrl = 'https://inspace-quote-backend.onrender.com';
 
 class Login extends Component {
   state = {
