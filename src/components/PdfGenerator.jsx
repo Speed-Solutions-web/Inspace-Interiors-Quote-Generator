@@ -155,7 +155,7 @@ const PdfGenerator = ({ quotationInfo, sections, grandTotal }) => {
 
           <button
             onClick={handlePrint}
-            className="btn-secondary w-full flex justify-center items-center"
+            className="btn btn-primary w-full flex justify-center items-center"
             disabled={sections.length === 0}
           >
             <FaDownload className="mr-2" /> Print Preview

@@ -114,7 +114,7 @@ const Section = ({ section, sectionOptions, sectionItems, pricingRates, onUpdate
                 <tbody className="bg-white divide-y divide-gray-200">
                   {items.map(item => (
                     <Item
-                      key={item.id}
+                      key={item.itemId}
                       item={item}
                       section={section}
                       sectionItems={sectionItems}

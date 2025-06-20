@@ -97,7 +97,7 @@ const PrintTemplate = forwardRef(({ quotationInfo, sections, grandTotal }, ref) 
                   const total = calculateItemTotal(item)
 
                   return (
-                    <tr key={item.id}>
+                    <tr key={item.itemId}>
                       <td className="border px-3 py-2 text-sm">{item.name}</td>
                       <td className="border px-3 py-2 text-sm">{item.natureOfWork || '-'}</td>
                       <td className="border px-3 py-2 text-sm">{item.dimensions.length}</td>
