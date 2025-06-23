@@ -36,19 +36,28 @@ export default class Quotes extends Component {
         if (!existing || new Date(q.createdAt) > new Date(existing.createdAt)) {
           latestQuotesMap[q.clientId] = q;
         }
-      });
+      }); 
       const latestQuotes = Object.values(latestQuotesMap);
 
       // 3. Fetch all unique user IDs from the latest quotes
       const uniqueUserIds = [...new Set(latestQuotes.map(q => q.createdBy))];
 
-      const userFetches = await Promise.all(
-        uniqueUserIds.map(id =>
-          axios.get(`${baseUrl}/users/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-        )
+      const userMap = {};
+
+      await Promise.all(
+        uniqueUserIds.map(async (id) => {
+          try {
+            const res = await axios.get(`${baseUrl}/users/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            userMap[id] = res.data.name;
+          } catch (err) {
+            console.warn(`User ${id} not found or error fetching:`, err.response?.status || err.message);
+            userMap[id] = 'Unknown';
+          }
+        })
       );
+
 
       const userMap = {};
       userFetches.forEach(res => {
