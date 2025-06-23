@@ -12,6 +12,7 @@ export default class Users extends Component {
     searchTerm: '',
     showModal: false,
     isEditing: false,
+    isLoading: false,
     currentUser: {
       id: null,
       name: '',
@@ -28,12 +29,14 @@ export default class Users extends Component {
   fetchUsers = async () => {
     try {
       const token = Cookies.get('jwt_token');
+      this.setState({ isLoading: true });
       const res = await axios.get(`${baseUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      this.setState({ users: res.data });
+      this.setState({ users: res.data, isLoading: false });
     } catch (err) {
       console.error('Error fetching users:', err);
+      this.setState({ isLoading: false });
     }
   };
 
@@ -131,12 +134,13 @@ export default class Users extends Component {
   };
 
   render() {
-    const { showModal, currentUser, isEditing } = this.state;
+    const { showModal, currentUser, isEditing, isLoading } = this.state;
     const filteredUsers = this.getFilteredUsers();
 
     return (
       <div className="container-fluid py-4">
         <h3 className='mb-3'>Users</h3>
+
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
           <button className="btn btn-primary text-white" onClick={() => this.handleOpenModal()}>
             + Add User
@@ -156,61 +160,70 @@ export default class Users extends Component {
           </div>
         </div>
 
-        <div className="table-responsive">
-          <table className="table table-bordered table-striped align-middle">
-            <thead className="table-darkred text-white">
-              <tr>
-                <th>#</th>
-                <th>Photo</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th className="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user, i) => (
-                  <tr key={user._id}>
-                    <td>{i + 1}</td>
-                    <td>
-                      <img
-                        src={user.avatarUrl || 'https://placehold.co/40'}
-                        alt="profile"
-                        className="rounded-circle"
-                        width="40"
-                        height="40"
-                      />
-                    </td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone}</td>
-                    <td className="text-center">
-                      <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => this.handleOpenModal(user)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => this.handleDelete(user._id)}
-                      >
-                        Delete
-                      </button>
+        {isLoading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-2 text-muted">Loading users...</p>
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped align-middle">
+              <thead className="table-darkred text-white">
+                <tr>
+                  <th>#</th>
+                  <th>Photo</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th className="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user, i) => (
+                    <tr key={user._id}>
+                      <td>{i + 1}</td>
+                      <td>
+                        <img
+                          src={user.avatarUrl || 'https://placehold.co/40'}
+                          alt="profile"
+                          className="rounded-circle"
+                          width="40"
+                          height="40"
+                        />
+                      </td>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phone}</td>
+                      <td className="text-center">
+                        <button
+                          className="btn btn-sm btn-outline-primary me-2"
+                          onClick={() => this.handleOpenModal(user)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => this.handleDelete(user._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center text-muted">
+                      No users found.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center text-muted">
-                    No users found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {showModal && (
           <div className="modal d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.3)' }}>

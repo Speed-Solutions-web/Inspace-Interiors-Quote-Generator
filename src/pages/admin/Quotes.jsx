@@ -1,4 +1,3 @@
-// ✅ Updated Quotes.jsx to fetch saved client quotes from backend
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import QuoteCard from '../../components/QuoteCard';
@@ -12,6 +11,7 @@ export default class Quotes extends Component {
     searchText: '',
     startDate: '',
     endDate: '',
+    isLoading: false,
   };
 
   componentDidMount() {
@@ -21,27 +21,25 @@ export default class Quotes extends Component {
   fetchQuotes = async () => {
     try {
       const token = Cookies.get('jwt_token');
+      this.setState({ isLoading: true });
 
-      // 1. Get all quotations
       const res = await axios.get(`${baseUrl}/quotations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const quotes = res.data;
 
-      // 2. Retain only latest version per clientId
       const latestQuotesMap = {};
       quotes.forEach(q => {
         const existing = latestQuotesMap[q.clientId];
         if (!existing || new Date(q.createdAt) > new Date(existing.createdAt)) {
           latestQuotesMap[q.clientId] = q;
         }
-      }); 
+      });
+
       const latestQuotes = Object.values(latestQuotesMap);
 
-      // 3. Fetch all unique user IDs from the latest quotes
       const uniqueUserIds = [...new Set(latestQuotes.map(q => q.createdBy))];
-
       const userMap = {};
 
       await Promise.all(
@@ -52,32 +50,25 @@ export default class Quotes extends Component {
             });
             userMap[id] = res.data.name;
           } catch (err) {
-            console.warn(`User ${id} not found or error fetching:`, err.response?.status || err.message);
+            console.warn(`⚠️ Could not fetch user ${id}`, err.response?.status || err.message);
             userMap[id] = 'Unknown';
           }
         })
       );
-
-
-      const userMap = {};
-      userFetches.forEach(res => {
-        const user = res.data;
-        userMap[user._id] = user.name;
-      });
 
       const formattedQuotes = latestQuotes.map(q => ({
         id: q._id,
         clientId: q.clientId,
         name: q.quotationInfo.clientName,
         projectLocation: q.quotationInfo.projectLocation,
-        quoteCreatedBy: userMap[q.createdBy] || 'N/A',
+        quoteCreatedBy: userMap[q.createdBy] || 'Unknown',
         quoteCreatedOn: new Date(q.createdAt),
       }));
 
-      this.setState({ quoteData: formattedQuotes });
-
+      this.setState({ quoteData: formattedQuotes, isLoading: false });
     } catch (err) {
-      console.error('Error fetching quotes:', err);
+      console.error('❌ Error fetching quotes:', err);
+      this.setState({ isLoading: false });
     }
   };
 
@@ -85,7 +76,6 @@ export default class Quotes extends Component {
     const confirmDelete = window.confirm(
       "⚠️ If you delete this quote, all versions related to this client will be permanently removed from the database.\n\nDo you want to continue?"
     );
-
     if (!confirmDelete) return;
 
     try {
@@ -96,14 +86,12 @@ export default class Quotes extends Component {
 
       const updatedData = this.state.quoteData.filter(item => item.clientId !== clientId);
       this.setState({ quoteData: updatedData });
-      alert("Client's quotations deleted successfully!");
+      alert("✅ Client's quotations deleted successfully!");
     } catch (err) {
       console.error('Error deleting client quotations:', err);
       alert("❌ Failed to delete. Please try again.");
     }
   };
-
-
 
   handleSearchChange = (e) => {
     this.setState({ searchText: e.target.value });
@@ -132,6 +120,7 @@ export default class Quotes extends Component {
   };
 
   render() {
+    const { isLoading } = this.state;
     const filteredQuotes = this.applyFilters();
 
     return (
@@ -140,7 +129,9 @@ export default class Quotes extends Component {
           <h3 className='mt-3'>Quotes</h3>
           <div className="row">
             <div className="col-md-4 mt-2">
-              <Link to='/admin/create-quote'><button type="button" className='btn btn-primary'>Create New Quote</button></Link>
+              <Link to='/admin/create-quote'>
+                <button type="button" className='btn btn-primary'>Create New Quote</button>
+              </Link>
             </div>
             <div className="col-md-4 mt-2">
               <input
@@ -167,19 +158,27 @@ export default class Quotes extends Component {
           </div>
 
           <div className="row">
-            {filteredQuotes.length === 0 ? (
+            {isLoading ? (
               <div className="text-center mt-4">
-                <p className="text-muted">No quotes found.</p>
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
               </div>
             ) : (
-              filteredQuotes.map(eachItem => (
-                <QuoteCard
-                  key={eachItem.id}
-                  cardDetails={eachItem}
-                  onDelete={() => this.handleDelete(eachItem.clientId)}
-                  onClick={() => this.props.navigate(`/admin/create-quote/${eachItem.id}`)}
-                />
-              ))
+              filteredQuotes.length === 0 ? (
+                <div className="text-center mt-4">
+                  <p className="text-muted">No quotes found.</p>
+                </div>
+              ) : (
+                filteredQuotes.map(eachItem => (
+                  <QuoteCard
+                    key={eachItem.id}
+                    cardDetails={eachItem}
+                    onDelete={() => this.handleDelete(eachItem.clientId)}
+                    onClick={() => this.props.navigate(`/admin/create-quote/${eachItem.id}`)}
+                  />
+                ))
+              )
             )}
           </div>
         </div>

@@ -9,7 +9,8 @@ class Login extends Component {
   state = {
     email: '',
     password: '',
-    error: ''
+    error: '',
+    isLoading: false
   };
 
   handleInputChange = (e) => {
@@ -19,6 +20,8 @@ class Login extends Component {
   handleLogin = async (e) => {
     e.preventDefault();
     const { email, password } = this.state;
+
+    this.setState({ isLoading: true, error: '' });
 
     try {
       const res = await axios.post(`${baseUrl}/api/auth/login`, {
@@ -43,11 +46,13 @@ class Login extends Component {
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed';
       this.setState({ error: errorMsg });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
   render() {
-    const { email, password, error } = this.state;
+    const { email, password, error, isLoading } = this.state;
 
     return (
       <div className="login-page">
@@ -90,7 +95,16 @@ class Login extends Component {
             )}
 
             <div className="col-12 d-flex justify-content-center mt-4">
-              <button className="btn-1 w-100" type="submit">Sign In</button>
+              <button className="btn-1 w-100 d-flex justify-content-center align-items-center" type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Signing In...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
             </div>
           </form>
         </div>
